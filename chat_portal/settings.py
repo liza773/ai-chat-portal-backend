@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os
+import dj_database_url
 
 from pathlib import Path
 import os
@@ -90,17 +92,15 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'ai_chat_portal'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', 'postgres://postgres:postgres@localhost:5432/ai_chat_portal'),
+        conn_max_age=600,
+    )
 }
+
 
 
 
@@ -152,3 +152,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
